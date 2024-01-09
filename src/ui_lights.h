@@ -183,7 +183,7 @@ extern "C"
             lv_slider_set_value(compass_slider, i, LV_ANIM_OFF);
         }
 
-        Serial.println("Updating lights data ");
+        //Serial.println("Updating lights data ");
 
     }
 

@@ -2,7 +2,8 @@
 #define MEM_CPU_NET_STAT_H
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
   static const char *PROGMEM UI_BLANK_STR = " ";
@@ -18,43 +19,59 @@ extern "C" {
 #endif
   static lv_obj_t *data_connections_list;
 
-  static void event_handler_data_conn(lv_event_t *e) {
+  static void event_handler_data_conn(lv_event_t *e)
+  {
     lv_event_code_t code = lv_event_get_code(e);
     const char *host_type = (const char *)lv_event_get_user_data(e);
     lv_obj_add_flag(data_connections_list, LV_OBJ_FLAG_HIDDEN);
-    if (code == LV_EVENT_CLICKED) {
-      if (strcmp(host_type, VENUS_MQTT_HOST_PREF) == 0) {
+    if (code == LV_EVENT_CLICKED)
+    {
+      if (strcmp(host_type, VENUS_MQTT_HOST_PREF) == 0)
+      {
         String host = preferences.getString(VENUS_MQTT_HOST_PREF);
         int port = preferences.getInt(VENUS_MQTT_PORT_PREF);
-        if (host.length() == 0 || host == "0.0.0.0") {
+        if (host.length() == 0 || host == "0.0.0.0")
+        {
           host = WiFi.localIP().toString();
         }
         lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "VE Venus MQTT", VENUS_MQTT_HOST_PREF);
-      } else if (strcmp(host_type, PYP_TCP_HOST_PREF) == 0) {
+      }
+      else if (strcmp(host_type, PYP_TCP_HOST_PREF) == 0)
+      {
         String host = preferences.getString(PYP_TCP_HOST_PREF);
         int port = preferences.getInt(PYP_TCP_PORT_PREF);
-        if (host.length() == 0 || host == "0.0.0.0") {
+        if (host.length() == 0 || host == "0.0.0.0")
+        {
           host = WiFi.localIP().toString();
         }
         lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "PyPilot TCP", PYP_TCP_HOST_PREF);
-      } else if (strcmp(host_type, SK_TCP_HOST_PREF) == 0) {
+      }
+      else if (strcmp(host_type, SK_TCP_HOST_PREF) == 0)
+      {
         String host = preferences.getString(SK_TCP_HOST_PREF);
         int port = preferences.getInt(SK_TCP_PORT_PREF);
-        if (host.length() == 0 || host == "0.0.0.0") {
+        if (host.length() == 0 || host == "0.0.0.0")
+        {
           host = WiFi.localIP().toString();
         }
         lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "SignalK TCP", SK_TCP_HOST_PREF);
-      } else if (strcmp(host_type, MPD_TCP_HOST_PREF) == 0) {
+      }
+      else if (strcmp(host_type, MPD_TCP_HOST_PREF) == 0)
+      {
         String host = preferences.getString(MPD_TCP_HOST_PREF);
         int port = preferences.getInt(MPD_TCP_PORT_PREF);
-        if (host.length() == 0 || host == "0.0.0.0") {
+        if (host.length() == 0 || host == "0.0.0.0")
+        {
           host = WiFi.localIP().toString();
         }
         lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "MPD Player", MPD_TCP_HOST_PREF);
-      } else if (strcmp(host_type, NMEA0183_TCP_HOST_PREF) == 0) {
+      }
+      else if (strcmp(host_type, NMEA0183_TCP_HOST_PREF) == 0)
+      {
         String host = preferences.getString(NMEA0183_TCP_HOST_PREF);
         int port = preferences.getInt(NMEA0183_TCP_PORT_PREF);
-        if (host.length() == 0 || host == "0.0.0.0") {
+        if (host.length() == 0 || host == "0.0.0.0")
+        {
           host = WiFi.localIP().toString();
         }
         lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "NMEA 0183 TCP", NMEA0183_TCP_HOST_PREF);
@@ -62,7 +79,8 @@ extern "C" {
     }
   }
 
-  void lv_data_connections(lv_obj_t *parent) {
+  void lv_data_connections(lv_obj_t *parent)
+  {
     data_connections_list = lv_list_create(parent);
     lv_obj_set_size(data_connections_list, 220, 180);
     lv_obj_align(data_connections_list, LV_ALIGN_CENTER, 0, 19);
@@ -76,7 +94,7 @@ extern "C" {
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)NMEA0183_TCP_HOST_PREF);
     btn = lv_list_add_btn(data_connections_list, NULL, "VE Venus MQTT");
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)VENUS_MQTT_HOST_PREF);
-#ifdef ENABLE_MPD 
+#ifdef ENABLE_MPD
     btn = lv_list_add_btn(data_connections_list, NULL, "MPD Player");
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)MPD_TCP_HOST_PREF);
 #endif
@@ -87,25 +105,30 @@ extern "C" {
     lv_ip_addr_editor_hide();
   }
 
-  static void erase_net_conf_evt_handler(lv_event_t *e) {
+  static void erase_net_conf_evt_handler(lv_event_t *e)
+  {
     lv_event_code_t code = lv_event_get_code(e);
-    if (code == LV_EVENT_LONG_PRESSED) {
+    if (code == LV_EVENT_LONG_PRESSED)
+    {
       erase_mdns_lookups();
       ESP_restart();
     }
   }
 
-  static void edit_net_conf_evt_handler(lv_event_t *e) {
+  static void edit_net_conf_evt_handler(lv_event_t *e)
+  {
     lv_event_code_t code = lv_event_get_code(e);
-    if (code == LV_EVENT_CLICKED) {
+    if (code == LV_EVENT_CLICKED)
+    {
       lv_obj_clear_flag(data_connections_list, LV_OBJ_FLAG_HIDDEN);
     }
   }
 
   /**
-   * A dev status display 
+   * A dev status display
    */
-  static void lv_dev_status_display(lv_obj_t *parent) {
+  static void lv_dev_status_display(lv_obj_t *parent)
+  {
     pyp_status_label = lv_label_create(parent);
     lv_obj_align(pyp_status_label, LV_ALIGN_TOP_LEFT, 20, 30);
     lv_label_set_recolor(pyp_status_label, true);
@@ -162,35 +185,36 @@ extern "C" {
     lv_obj_add_flag(data_connections_list, LV_OBJ_FLAG_HIDDEN);
   }
 
-  static void dev_status_update_cb() {
+  static void dev_status_update_cb()
+  {
     lv_label_set_text(pyp_status_label,
                       ((pypClient.c.connected() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
+                                                : String(F("#ff0000 " LV_SYMBOL_OK "  #"))) += String(F("PyPilot:              ")) += preferences.getString(PYP_TCP_HOST_PREF) += String(":") += String(preferences.getInt(PYP_TCP_PORT_PREF)))
+                          .c_str());
+    /* lv_label_set_text(signalk_status_label,
+                       ((skClient.c.connected() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
                                                 : String(F("#ff0000 " LV_SYMBOL_OK "  #")))
-                       += String(F("PyPilot:              ")) += preferences.getString(PYP_TCP_HOST_PREF)
-                       += String(":") += String(preferences.getInt(PYP_TCP_PORT_PREF)))
-                        .c_str());
+                        += String(F("SignalK:             ")) += preferences.getString(SK_TCP_HOST_PREF)
+                        += String(":") += String(preferences.getInt(SK_TCP_PORT_PREF)))
+                         .c_str());
+    */
     lv_label_set_text(signalk_status_label,
-                      ((skClient.c.connected() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
-                                               : String(F("#ff0000 " LV_SYMBOL_OK "  #")))
-                       += String(F("SignalK:             ")) += preferences.getString(SK_TCP_HOST_PREF)
-                       += String(":") += String(preferences.getInt(SK_TCP_PORT_PREF)))
-                        .c_str());
+                     ((wsskClient.c.available() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
+                                                : String(F("#ff0000 " LV_SYMBOL_OK "  #"))) += String(F("SignalK:             ")) += preferences.getString(SK_TCP_HOST_PREF) += String(":") += String(preferences.getInt(SK_TCP_PORT_PREF)))
+                         .c_str());
     lv_label_set_text(nmea0183_status_label,
                       ((nmea0183Client.c.connected() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
-                                                     : String(F("#ff0000 " LV_SYMBOL_OK "  #")))
-                       += String(F("NMEA 0183:       ")) += preferences.getString(NMEA0183_TCP_HOST_PREF)
-                       += String(":") += String(preferences.getInt(NMEA0183_TCP_PORT_PREF)))
-                        .c_str());
+                                                     : String(F("#ff0000 " LV_SYMBOL_OK "  #"))) += String(F("NMEA 0183:       ")) += preferences.getString(NMEA0183_TCP_HOST_PREF) += String(":") += String(preferences.getInt(NMEA0183_TCP_PORT_PREF)))
+                          .c_str());
     lv_label_set_text(venus_mqtt_status_label,
                       ((mqttNetClient.connected() && mqttClient.connected() ? String(F("#00ff00 " LV_SYMBOL_OK "  #"))
-                                                                            : String(F("#ff0000 " LV_SYMBOL_OK "  #")))
-                       += String(F("Venus MQTT:    ")) += preferences.getString(VENUS_MQTT_HOST_PREF)
-                       += String(":") += String(preferences.getInt(VENUS_MQTT_PORT_PREF)))
-                        .c_str());
+                                                                            : String(F("#ff0000 " LV_SYMBOL_OK "  #"))) += String(F("Venus MQTT:    ")) += preferences.getString(VENUS_MQTT_HOST_PREF) += String(":") += String(preferences.getInt(VENUS_MQTT_PORT_PREF)))
+                          .c_str());
   }
 
-  void init_devStatusScreen() {
-    devStatusScreen.screen = lv_obj_create(NULL);  // Creates a Screen object
+  void init_devStatusScreen()
+  {
+    devStatusScreen.screen = lv_obj_create(NULL); // Creates a Screen object
     devStatusScreen.init_cb = lv_dev_status_display;
     devStatusScreen.update_cb = dev_status_update_cb;
   }

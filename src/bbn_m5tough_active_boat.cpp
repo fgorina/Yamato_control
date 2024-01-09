@@ -40,7 +40,8 @@
 #include <MQTT.h>  // https://github.com/256dpi/arduino-mqtt
 #include <HTTPClient.h>
 #include <Preferences.h>
-
+#include <ArduinoWebsockets.h>
+using namespace websockets;
 // config store.
 Preferences preferences;
 
@@ -56,8 +57,15 @@ typedef struct _NetClient {
   unsigned long lastActivity = 0U;
 } NetClient;
 
+typedef struct _WsNetClient {
+  WebsocketsClient c = WebsocketsClient();
+  unsigned long lastActivity = 0U;
+  String id = "WSClient";
+} WsNetClient;
+
 NetClient nmea0183Client;
 NetClient skClient;
+WsNetClient wsskClient;
 NetClient pypClient;
 WiFiClient mqttNetClient;
 MQTTClient mqttClient = MQTTClient(4096);  // Data loss if buffer is not enough
@@ -119,6 +127,7 @@ WMM_Tinier myDeclination;
 #include "signalk_parse.h"
 #include "net_signalk_http.h"
 #include "net_signalk_tcp.h"
+#include "net_signalk_ws.h"
 #include "pypilot_parse.h"
 #include "net_pypilot.h"
 
@@ -245,8 +254,14 @@ void setup() {
 
     static String signalk_tcp_host = preferences.getString(SK_TCP_HOST_PREF);
     static int signalk_tcp_port = preferences.getInt(SK_TCP_PORT_PREF);
+    /*
     if (signalk_tcp_host.length() > 0 && signalk_tcp_port > 0 && !signalk_tcp_host.equals(BLANK_IP)) {
       signalk_begin(skClient, signalk_tcp_host.c_str(), signalk_tcp_port);  // Connect to the SignalK TCP server
+    }
+    */
+
+     if (signalk_tcp_host.length() > 0 && signalk_tcp_port > 0 && !signalk_tcp_host.equals(BLANK_IP)) {
+      ws_signalk_begin(wsskClient, signalk_tcp_host.c_str(), signalk_tcp_port);  // Connect to the SignalK TCP server
     }
 
     static String pypilot_tcp_host = preferences.getString(PYP_TCP_HOST_PREF);
@@ -285,6 +300,7 @@ void loop() {
   M5.update();
   lv_task_handler();
   app.tick();
+  wsskClient.c.poll();
 #if !(LV_TICK_CUSTOM)
   lv_tick_inc(1);
 #endif
