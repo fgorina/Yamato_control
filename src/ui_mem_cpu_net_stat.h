@@ -54,7 +54,7 @@ extern "C"
         {
           host = WiFi.localIP().toString();
         }
-        lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "SignalK TCP", SK_TCP_HOST_PREF);
+        lv_ip_addr_editor_show(host.c_str(), (int32_t)port, "SignalK ws", SK_TCP_HOST_PREF);
       }
       else if (strcmp(host_type, MPD_TCP_HOST_PREF) == 0)
       {
@@ -88,7 +88,7 @@ extern "C"
     lv_obj_t *btn;
     btn = lv_list_add_btn(data_connections_list, NULL, "PyPilot TCP");
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)PYP_TCP_HOST_PREF);
-    btn = lv_list_add_btn(data_connections_list, NULL, "SignalK TCP");
+    btn = lv_list_add_btn(data_connections_list, NULL, "SignalK ws");
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)SK_TCP_HOST_PREF);
     btn = lv_list_add_btn(data_connections_list, NULL, "NMEA 0183 TCP");
     lv_obj_add_event_cb(btn, event_handler_data_conn, LV_EVENT_CLICKED, (void *)NMEA0183_TCP_HOST_PREF);

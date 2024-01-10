@@ -9,7 +9,6 @@ extern "C"
 
   void set_vessel_nav_state(String &val)
   {
-
     if (val == "moored")
     {
       shipDataModel.navigation.state.st = nav_state_e::NS_MOORED;
@@ -34,7 +33,6 @@ extern "C"
 
   auto update_value = [&](String &path, size_t &u_idx, size_t &v_idx, JsonVariant &value)
   {
-    
     const char *p = path.c_str();
     if (starts_with(p, "navigation."))
     {
@@ -506,7 +504,7 @@ extern "C"
                   String path = valueObj["path"].as<const char *>();
                   if (path != NULL)
                   {
-                    
+
                     JsonVariant value = valueObj["value"];
                     // Serial.print("Value "); Serial.println(value.as<int>());
                     //  PACO Removed the test of NULL becasuse when value == 0 (an integer) fails!!!

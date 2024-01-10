@@ -61,7 +61,7 @@ extern "C" {
     String signalk_tcp_host = preferences.getString(SK_TCP_HOST_PREF);
     int signalk_tcp_port = preferences.getInt(SK_TCP_PORT_PREF);
     if (signalk_tcp_host.length() <= 0 || signalk_tcp_host == "0.0.0.0" || signalk_tcp_port <= 0) {
-      int n = mdns_query_svc("signalk-tcp", "tcp");
+      int n = mdns_query_svc("signalk-ws", "tcp");  // Changed to locate the ws service instead of the tcp one
       if (n > 0) {
         preferences.putString(SK_TCP_HOST_PREF, MDNS.IP(0).toString());
         preferences.putInt(SK_TCP_PORT_PREF, MDNS.port(0));
