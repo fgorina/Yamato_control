@@ -69,6 +69,7 @@ extern "C" {
       }
     }
 
+/*
     String signalk_http_host = preferences.getString(SK_HTTP_HOST_PREF);
     int signalk_http_port = preferences.getInt(SK_HTTP_PORT_PREF);
     if (signalk_http_host.length() <= 0 || signalk_http_host == "0.0.0.0" || signalk_http_port <= 0) {
@@ -79,7 +80,7 @@ extern "C" {
         saved = true;
       }
     }
-
+*/
     String nmea0183_tcp_host = preferences.getString(NMEA0183_TCP_HOST_PREF);
     int nmea0183_tcp_port = preferences.getInt(NMEA0183_TCP_PORT_PREF);
     if (nmea0183_tcp_host.length() <= 0 || nmea0183_tcp_host == "0.0.0.0" || nmea0183_tcp_port <= 0 || nmea0183_tcp_port != 10110) {
