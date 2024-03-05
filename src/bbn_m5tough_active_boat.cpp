@@ -131,6 +131,8 @@ WMM_Tinier myDeclination;
 #include "pypilot_parse.h"
 #include "net_pypilot.h"
 
+#include "BLE_Client.h"
+
 #include "ui_ip_add_editor.h"
 #include "ui_mem_cpu_net_stat.h"
 #include "ui_compass.h"
@@ -148,6 +150,9 @@ WMM_Tinier myDeclination;
 #include "ui_weather.h"
 #include "ui_power_victron.h"
 #include "ui_vessel_info.h"
+#include "ui_windlass.h"
+
+
 
 lv_updatable_screen_t* screens[] = {
 
@@ -157,6 +162,7 @@ lv_updatable_screen_t* screens[] = {
   &engineScreen,
   &autopilotScreen,
   &lightsScreen,
+  &windlassScreen,
 #ifdef ENABLE_MPD  // TODO:
   &playerScreen,
 #endif
@@ -238,6 +244,7 @@ void setup() {
     init_tanksScreen();
     init_autopilotScreen();
     init_lightsScreen();
+    init_windlassScreen();
     init_heelScreen();
     init_tripDataScreen();
     init_compassScreen();

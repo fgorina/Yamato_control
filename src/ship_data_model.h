@@ -12,6 +12,12 @@ extern "C" {
   } on_off_e;
 
   typedef enum {
+    WLUP = -1,
+    WLOFF = 0,
+    WLDOWN = 1
+  } windlass_state_e;
+
+  typedef enum {
     SEVERITY_NA = -1,
     ALARM = 0,
     ALERT = 1,
@@ -150,6 +156,16 @@ extern "C" {
     struct _next_point_t next_point;
   } course_rhumbline_t;
 
+  typedef struct _windlass_state_t {
+    windlass_state_e state = windlass_state_e::WLOFF;
+    age_t age = 0U;
+  } windlass_state_t;
+
+  typedef struct _anchor_t {
+    struct _length_m_t rode_length;
+    struct _windlass_state_t windlass_state;
+  } anchor_t;
+
   typedef enum {
     NS_NA = -1,  // not available
     NS_MOORED = 0,
@@ -184,6 +200,7 @@ extern "C" {
     struct _angle_deg_t set_true;
     struct _nav_lights_t lights;
     struct _course_rhumbline_t course_rhumbline;
+    struct _anchor_t anchor;
   } navigation_t;
 
   typedef struct _wind_t {
