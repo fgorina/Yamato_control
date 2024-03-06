@@ -1,7 +1,7 @@
 #define LV_HOR_RES_MAX 320
 #define LV_VER_RES_MAX 240
 
-//#define ENABLE_SCREEN_SERVER // This server sends screenshots via serial to processing.org sketch running on PC (not for production)
+// #define ENABLE_SCREEN_SERVER // This server sends screenshots via serial to processing.org sketch running on PC (not for production)
 
 #undef ENABLE_MPD
 //
@@ -26,8 +26,7 @@
 //
 //
 
-
-#include <M5Tough.h>  // https://github.com/m5stack/M5Tough
+#include <M5Tough.h> // https://github.com/m5stack/M5Tough
 #include <lvgl.h>
 #include <Arduino.h>
 #include <time.h>
@@ -37,7 +36,7 @@
 #include <WiFi.h>
 #include <ESPmDNS.h>
 #include <mdns.h>
-#include <MQTT.h>  // https://github.com/256dpi/arduino-mqtt
+#include <MQTT.h> // https://github.com/256dpi/arduino-mqtt
 #include <HTTPClient.h>
 #include <Preferences.h>
 #include <ArduinoWebsockets.h>
@@ -45,19 +44,21 @@ using namespace websockets;
 // config store.
 Preferences preferences;
 
-static String wifi_ssid;      // Store the name of the wireless network.
-static String wifi_password;  // Store the password of the wireless network.
+static String wifi_ssid;     // Store the name of the wireless network.
+static String wifi_password; // Store the password of the wireless network.
 
 #include <ArduinoJson.h>
 #undef min(a, b)
-#include <ReactESP.h>  // https://github.com/mairas/ReactESP
+#include <ReactESP.h> // https://github.com/mairas/ReactESP
 
-typedef struct _NetClient {
+typedef struct _NetClient
+{
   WiFiClient c = WiFiClient();
   unsigned long lastActivity = 0U;
 } NetClient;
 
-typedef struct _WsNetClient {
+typedef struct _WsNetClient
+{
   WebsocketsClient c = WebsocketsClient();
   unsigned long lastActivity = 0U;
   String id = "WSClient";
@@ -68,7 +69,7 @@ NetClient skClient;
 WsNetClient wsskClient;
 NetClient pypClient;
 WiFiClient mqttNetClient;
-MQTTClient mqttClient = MQTTClient(4096);  // Data loss if buffer is not enough
+MQTTClient mqttClient = MQTTClient(4096); // Data loss if buffer is not enough
 static bool victron_mqtt_began = false;
 
 #include "TinyGPSPlus.h"
@@ -90,13 +91,13 @@ TinyGPSPlus gps;
 #include "ui_settings.h"
 #include "ui_clock.h"
 
-#ifdef ENABLE_SCREEN_SERVER  // This server sends screenshots via serial to processing.org sketch running on PC
+#ifdef ENABLE_SCREEN_SERVER // This server sends screenshots via serial to processing.org sketch running on PC
 // See https://github.com/Bodmer/TFT_eSPI/blob/master/examples/Generic/TFT_Screen_Capture/processing_sketch.ino
 // Set the baud rate in it to default M5Stack as int serial_baud_rate = 115200;
 #include "screenServer.h"
 #endif
 
-#ifdef ENABLE_MPD  // TODO:
+#ifdef ENABLE_MPD // TODO:
 #include "ui_player_control.h"
 #endif
 
@@ -152,69 +153,78 @@ WMM_Tinier myDeclination;
 #include "ui_vessel_info.h"
 #include "ui_windlass.h"
 
+lv_updatable_screen_t *screens[] = {
 
-
-lv_updatable_screen_t* screens[] = {
-
-  &windScreen,
-  &heelScreen,
-  &rudderScreen,
-  &engineScreen,
-  &autopilotScreen,
-  &lightsScreen,
-  &windlassScreen,
-#ifdef ENABLE_MPD  // TODO:
-  &playerScreen,
+    &windScreen,
+    &heelScreen,
+    &rudderScreen,
+    &engineScreen,
+    &autopilotScreen,
+    &lightsScreen,
+    &windlassScreen,
+#ifdef ENABLE_MPD // TODO:
+    &playerScreen,
 #endif
-  &victronScreen,
-  &tanksScreen,
-  &vesselScreen,
-  &rebootScreen,
-  &aboutScreen,
-  &devStatusScreen,
-  &clockScreen,
-  &compassScreen,
-  &tripDataScreen,
-  &weatherScreen,
-  &gpsScreen,
-  &speedScreen,
-  &depthScreen,
+    &victronScreen,
+    &tanksScreen,
+    &vesselScreen,
+    &rebootScreen,
+    &aboutScreen,
+    &devStatusScreen,
+    &clockScreen,
+    &compassScreen,
+    &tripDataScreen,
+    &weatherScreen,
+    &gpsScreen,
+    &speedScreen,
+    &depthScreen,
 };
 
 int page = 0;
 int pages_count = sizeof(screens) / sizeof(screens[0]);
 
-void next_page() {
+void next_page()
+{
   lv_obj_clean(screens[page]->screen);
   page++;
-  if (page >= pages_count) page = 0;
+  if (page >= pages_count)
+    page = 0;
   init_screen(*screens[page]);
   lv_scr_load(screens[page]->screen);
 }
 
-void prev_page() {
+void prev_page()
+{
   lv_obj_clean(screens[page]->screen);
   page--;
-  if (page < 0) page = pages_count - 1;
+  if (page < 0)
+    page = pages_count - 1;
   init_screen(*screens[page]);
   lv_scr_load(screens[page]->screen);
 }
 
-bool handle_swipe() {
-  if (swipe_vert_detected()) {
+bool handle_swipe()
+{
+  if (swipe_vert_detected())
+  {
     toggle_ui_theme();
     return true;
-  } else if (swipe_right_detected()) {
+  }
+  else if (swipe_right_detected())
+  {
     next_page();
     return true;
-  } else if (swipe_left_detected()) {
+  }
+  else if (swipe_left_detected())
+  {
     prev_page();
     return true;
   }
   return false;
 }
 
-void setup() {
+void setup()
+{
   myDeclination.begin();
   tft_lv_initialization();
   init_disp_driver();
@@ -223,11 +233,13 @@ void setup() {
   rtc_begin();
 
   page = restore_page();
-  if (page < 0 || page >= pages_count) {
+  if (page < 0 || page >= pages_count)
+  {
     page = 0;
   }
 
-  settingUpWiFi([]() {
+  settingUpWiFi([]()
+                {
     init_dateTime();
 
     init_windScreen();
@@ -237,7 +249,7 @@ void setup() {
     init_speedScreen();
     init_depthScreen();
     init_clockScreen();
-#ifdef ENABLE_MPD  // TODO:
+#ifdef ENABLE_MPD // TODO:
     init_playerScreen();
 #endif
     init_victronScreen();
@@ -292,8 +304,7 @@ void setup() {
 
     app.onDelay(750, []() {
       getVesselInfo();
-    });
-  });
+    }); });
 
   SpeakerInit();
   DingDong();
@@ -303,7 +314,8 @@ unsigned long last_ui_upd = 0;
 
 #define GO_SLEEP_TIMEOUT 1800000ul
 
-void loop() {
+void loop()
+{
   M5.update();
   lv_task_handler();
   app.tick();
@@ -312,25 +324,31 @@ void loop() {
   lv_tick_inc(1);
 #endif
 
-  if (!settingMode) {
-    if (last_touched > 0 && millis() - last_touched > GO_SLEEP_TIMEOUT) {
+  if (!settingMode)
+  {
+    if (last_touched > 0 && millis() - last_touched > GO_SLEEP_TIMEOUT)
+    {
       disconnect_clients();
       save_page(page);
       deep_sleep_with_touch_wakeup();
-    } else {
-      if (victron_mqtt_began) {
+    }
+    else
+    {
+      if (victron_mqtt_began)
+      {
         victron_mqtt_client_loop(mqttClient);
       }
       bool detected = handle_swipe();
-      if (detected || (millis() - last_ui_upd > 300)
-        || (screens[page] == &clockScreen && millis() - last_ui_upd > 200)) {  // throttle expensive UI updates, and calculations
+      if (detected || (millis() - last_ui_upd > 300) || (screens[page] == &clockScreen && millis() - last_ui_upd > 200))
+      { // throttle expensive UI updates, and calculations
         derive_data();
         update_screen(*screens[page]);
         last_ui_upd = millis();
       }
 #ifdef ENABLE_SCREEN_SERVER
       // (not for production)
-      if (detected) {
+      if (detected)
+      {
         screenServer0();
       }
 #endif
