@@ -161,7 +161,9 @@ lv_updatable_screen_t *screens[] = {
     &engineScreen,
     &autopilotScreen,
     &lightsScreen,
-    &windlassScreen,
+#ifdef ENABLE_WINDLASS
+    windlassScreen,
+#endif
 #ifdef ENABLE_MPD // TODO:
     &playerScreen,
 #endif
@@ -249,6 +251,9 @@ void setup()
     init_speedScreen();
     init_depthScreen();
     init_clockScreen();
+#ifdef ENABLE_WINDLASS
+     init_windlassScreen();
+#endif
 #ifdef ENABLE_MPD // TODO:
     init_playerScreen();
 #endif
@@ -256,7 +261,7 @@ void setup()
     init_tanksScreen();
     init_autopilotScreen();
     init_lightsScreen();
-    init_windlassScreen();
+   
     init_heelScreen();
     init_tripDataScreen();
     init_compassScreen();
