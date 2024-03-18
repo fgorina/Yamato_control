@@ -21,9 +21,12 @@ extern "C" {
   }
 
   static void disconnect_clients() {
-    if (skClient.c.connected()) {
-      skClient.c.stop();
+
+    if(wsskClient.c.available()){
+      wsskClient.c.close();
     }
+
+    
     if (pypClient.c.connected()) {
       pypClient.c.stop();
     }

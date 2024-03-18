@@ -4,6 +4,7 @@
 // #define ENABLE_SCREEN_SERVER // This server sends screenshots via serial to processing.org sketch running on PC (not for production)
 
 #undef ENABLE_MPD
+#define ENABLE_WINDLASS 1
 //
 //
 //  Changes to lv_conf.h (LVGL 8.x) needed:
@@ -65,7 +66,7 @@ typedef struct _WsNetClient
 } WsNetClient;
 
 NetClient nmea0183Client;
-NetClient skClient;
+//NetClient skClient;
 WsNetClient wsskClient;
 NetClient pypClient;
 WiFiClient mqttNetClient;
@@ -162,12 +163,14 @@ lv_updatable_screen_t *screens[] = {
     &autopilotScreen,
     &lightsScreen,
 #ifdef ENABLE_WINDLASS
-    windlassScreen,
+    &windlassScreen,
 #endif
 #ifdef ENABLE_MPD // TODO:
     &playerScreen,
 #endif
+#ifdef ENABLE_VICTRON
     &victronScreen,
+#endif
     &tanksScreen,
     &vesselScreen,
     &rebootScreen,
@@ -257,7 +260,9 @@ void setup()
 #ifdef ENABLE_MPD // TODO:
     init_playerScreen();
 #endif
+#ifdef ENABLE_VICTRON
     init_victronScreen();
+#endif
     init_tanksScreen();
     init_autopilotScreen();
     init_lightsScreen();
@@ -299,13 +304,14 @@ void setup()
     if (nmea0183_tcp_host.length() > 0 && nmea0183_tcp_port > 0 && !nmea0183_tcp_host.equals(BLANK_IP)) {
       nmea0183_tcp_begin(nmea0183Client, nmea0183_tcp_host.c_str(), nmea0183_tcp_port);  // Connect to the NMEA 0183 TCP server
     }
-
+#ifdef ENABLE_VICTRON
     static String victron_mqtt_host = preferences.getString(VENUS_MQTT_HOST_PREF);
     static int victron_mqtt_port = preferences.getInt(VENUS_MQTT_PORT_PREF);
     if (victron_mqtt_host.length() > 0 && victron_mqtt_port > 0 && !victron_mqtt_host.equals(BLANK_IP)) {
       victron_mqtt_client_begin(mqttClient, mqttNetClient, victron_mqtt_host.c_str(), victron_mqtt_port);
       victron_mqtt_began = true;
     }
+#endif
 
     app.onDelay(750, []() {
       getVesselInfo();
@@ -331,6 +337,7 @@ void loop()
 
   if (!settingMode)
   {
+
     if (last_touched > 0 && millis() - last_touched > GO_SLEEP_TIMEOUT)
     {
       disconnect_clients();
@@ -339,10 +346,12 @@ void loop()
     }
     else
     {
+      #ifdef ENABLE_VICTRON
       if (victron_mqtt_began)
       {
         victron_mqtt_client_loop(mqttClient);
       }
+      #endif
       bool detected = handle_swipe();
       if (detected || (millis() - last_ui_upd > 300) || (screens[page] == &clockScreen && millis() - last_ui_upd > 200))
       { // throttle expensive UI updates, and calculations

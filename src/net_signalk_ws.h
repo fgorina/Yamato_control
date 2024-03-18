@@ -82,7 +82,7 @@ extern "C"
       }else{
         Serial.println(".");
       }
-      if (client.lastActivity > 0 && (millis() - client.lastActivity) > 10000) {
+      if (client.lastActivity > 0 && (millis() - client.lastActivity) > 1000000) {
         Serial.println("Closing wss connection");
         client.c.close();
         client.lastActivity = 0;

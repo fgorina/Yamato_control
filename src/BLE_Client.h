@@ -33,7 +33,9 @@ BLERemoteCharacteristic* windlassCharacteristic;
 
 class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
     void onResult(BLEAdvertisedDevice advertisedDevice) {
+      Serial.println(advertisedDevice.getName().c_str());
         if(advertisedDevice.getName() != ""){
+            
             BLEUUID service = advertisedDevice.getServiceUUID();
             if (service.toString() == SERVICE_UUID){
                 molinet = new BLEAdvertisedDevice(advertisedDevice);
@@ -47,7 +49,8 @@ class MyAdvertisedDeviceCallbacks: public BLEAdvertisedDeviceCallbacks {
 
 class MyClientCallback : public BLEClientCallbacks {
   void onConnect(BLEClient* pclient) {
-    bleConnected = true;
+    //bleConnected = true;
+    Serial.println("onConnect");
   }
 
   void onDisconnect(BLEClient* pclient) {
@@ -146,6 +149,7 @@ void pendura(){
 bool connect_ble(){
 
     bleClient->connect(molinet);
+
     Serial.println("Connected to Molinet");
     BLERemoteService* pRemoteService = bleClient->getService(SERVICE_UUID);
     if (pRemoteService == nullptr) {
@@ -156,7 +160,7 @@ bool connect_ble(){
     Serial.println(" - Found our service");
     commandCharacteristic = pRemoteService->getCharacteristic(COMMAND_CHARACTERISTIC_UUID);
     if (commandCharacteristic == nullptr) {
-      Serial.print("Failed to find our characteristic UUID: ");
+      Serial.print("Failed to find characteristic UUID: ");
       Serial.println(COMMAND_CHARACTERISTIC_UUID);
       bleClient->disconnect();
       return false;
@@ -165,13 +169,19 @@ bool connect_ble(){
 
     windlassCharacteristic = pRemoteService->getCharacteristic(WINDLASS_CHARACTERISTIC_UUID);
     if (windlassCharacteristic == nullptr) {
-      Serial.print("Failed to find our characteristic UUID: ");
+      Serial.print("Failed to find characteristic UUID: ");
       Serial.println(WINDLASS_CHARACTERISTIC_UUID);
       bleClient->disconnect();
       return false;
     }
     Serial.println(" - Found windlass characteristic");
     windlassCharacteristic->registerForNotify(bleNotifyCallback);
+
+    const char* buff = windlassCharacteristic->readValue().c_str();
+    size_t len = strlen(buff);
+
+    bleNotifyCallback(windlassCharacteristic, (uint8_t*)buff,len, false) ;
+    bleConnected = true;
     return true;
 }
 
@@ -179,21 +189,26 @@ bool connect_ble(){
 void setup_ble() {
 
   if(bleConnected){
+     Serial.println("Already connected to  BLE work!");
     return;
   }
 
   Serial.println("Starting BLE work!");
 
   BLEDevice::init("");
+
+  Serial.println("Scannig Network");
   
   pBLEScan = BLEDevice::getScan();
   pBLEScan->setAdvertisedDeviceCallbacks(new MyAdvertisedDeviceCallbacks());
   pBLEScan->setActiveScan(true);
   pBLEScan->setInterval(100);
   pBLEScan->setWindow(99);
-
+ // wsskClient.c.poll();
   BLEScanResults foundDevices = pBLEScan->start(scanTime, false);
+ // wsskClient.c.poll();
   Serial.println("Scan done!");
+
   pBLEScan->clearResults(); 
 
   if (molinetFound){
@@ -203,14 +218,12 @@ void setup_ble() {
     Serial.println(molinet->getAddress().toString().c_str());
 
     bleClient = BLEDevice::createClient();
+    bleClient->setClientCallbacks(new MyClientCallback());
 
     bool done = connect_ble();
 
   }
 }
-
-
-
 
 
 #ifdef __cplusplus

@@ -8,6 +8,7 @@ extern "C"
 
     lv_updatable_screen_t windlassScreen;
 
+    static lv_obj_t *windlass_led;
     static lv_obj_t *some_rode_length;
     static lv_obj_t *some_depth;
     static lv_obj_t *windlass_btnm;
@@ -146,6 +147,7 @@ extern "C"
     }
      static void windlass_update_cb()
     {
+        lv_led_set_color(windlass_led, lv_palette_main(bleConnected ? LV_PALETTE_GREEN : LV_PALETTE_RED));
         
         windlass_update_ctrl_matrix();
         lv_btnmatrix_set_ctrl_map(windlass_btnm, windlass_ctrl_map);
@@ -168,14 +170,16 @@ extern "C"
         const int width_l = 120;
 
         // Check if we are connected. If not connect
-
-        setup_ble();
+    windlass_led = lv_led_create(parent);
+    lv_obj_align(windlass_led, LV_ALIGN_OUT_LEFT_TOP, 8, 13);
+    lv_led_set_color(windlass_led, lv_palette_main(LV_PALETTE_GREY));
+    lv_led_on(windlass_led);
 
         some_rode_length = lv_label_create(parent);
         lv_label_set_text_static(some_rode_length, "--- m");
         lv_obj_set_width(some_rode_length, width_l);
         lv_obj_set_style_text_align(some_rode_length, LV_TEXT_ALIGN_LEFT, 0);
-        lv_obj_align(some_rode_length, LV_ALIGN_TOP_LEFT, 0  , 5);
+        lv_obj_align(some_rode_length, LV_ALIGN_TOP_LEFT, 50 , 5);
 
         #if LV_FONT_MONTSERRAT_40
             lv_obj_set_style_text_font(some_rode_length, &lv_font_montserrat_40, 0);
@@ -199,12 +203,13 @@ extern "C"
         lv_btnmatrix_set_btn_ctrl_all(windlass_btnm, LV_BTNMATRIX_CTRL_CHECKABLE);
         lv_obj_add_event_cb(windlass_btnm, windlass_event_cb, LV_EVENT_CLICKED, NULL);
 
-        
+        Serial.println("Screen created ");
 
-         Serial.println("Screen created ");
-  
-
-        windlass_update_cb();
+        windlass_update_cb(); 
+        setup_ble(); 
+           
+                    
+       
     }
 
 
