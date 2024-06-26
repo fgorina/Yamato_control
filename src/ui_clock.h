@@ -71,7 +71,7 @@ extern "C" {
     char bufferDate[14];
     char bufferTime[12];
 
-    sprintf(bufferDate, "%04d-%02d-%02d", 100 + RTCdate.Year, 1 + RTCdate.Month, RTCdate.Date);
+    sprintf(bufferDate, "%04d-%02d-%02d", RTCdate.Year, RTCdate.Month, RTCdate.Date);
     sprintf(bufferTime, "%02d:%02d:%02d", RTCtime.Hours, RTCtime.Minutes, RTCtime.Seconds);
 
     lv_label_set_text(labelDate, bufferDate);

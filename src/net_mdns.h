@@ -65,6 +65,8 @@ extern "C" {
       if (n > 0) {
         preferences.putString(SK_TCP_HOST_PREF, MDNS.IP(0).toString());
         preferences.putInt(SK_TCP_PORT_PREF, MDNS.port(0));
+        preferences.putString(SK_HTTP_HOST_PREF, MDNS.IP(0).toString());
+        preferences.putInt(SK_HTTP_PORT_PREF, MDNS.port(0));
         saved = true;
       }
     }

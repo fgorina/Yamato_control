@@ -7,6 +7,8 @@ extern "C"
 {
 #endif
 
+bool setDateTime = true;
+
   void set_vessel_nav_state(String &val)
   {
     if (val == "moored")
@@ -149,6 +151,26 @@ extern "C"
           }
         }
       }
+      // Change so rtc time is initialized to UTC from GPS. Should be quite exact
+      else if (strcmp(t, "datetime") == 0)
+      {
+        if (value.is<String>())
+        {
+          String val = value.as<String>();
+          if (val != NULL)
+          {
+            if(setDateTime){
+
+              setupTimeGPS(val);
+              M5.Rtc.GetDate(&RTCdate);
+              M5.Rtc.GetTime(&RTCtime);
+
+              setDateTime = false;
+            }
+          }
+        }
+
+      }
       else if (strcmp(t, "lights.navigation.state") == 0)
       {
 
@@ -268,7 +290,7 @@ extern "C"
           shipDataModel.tanks.tank[idx].percent_of_full.age = millis();
           shipDataModel.tanks.tank[idx].fluid_type = (fluid_type_e)idTankType;
         }
-        else if (attr == "capacityx")
+        else if (attr == "capacity")
         {
           shipDataModel.tanks.tank[idx].volume.L = value.as<float>() * 1000.0;
           shipDataModel.tanks.tank[idx].volume.age = millis();
@@ -293,6 +315,7 @@ extern "C"
         const char *w = step_into_token(t);
         if (strcmp(w, "angleApparent") == 0)
         {
+          
           if (value.is<float>())
           {
             shipDataModel.environment.wind.apparent_wind_angle.deg = value.as<float>() * 180.0 / PI;

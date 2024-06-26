@@ -6,7 +6,7 @@ extern "C"
 {
 #endif
 
-
+bool reloadVessel = true;
 
 
   void onWsEventsCallback(WebsocketsEvent event, String data)
@@ -14,13 +14,19 @@ extern "C"
     if (event == WebsocketsEvent::ConnectionOpened)
     {
         Serial.println("Wss Connnection Opened");
-        wsskClient.lastActivity = millis();
-        getVesselInfo();
-     
+       // wsskClient.lastActivity = millis();
+        if(reloadVessel){
+          Serial.println("Getting vessel values");
+          reloadVessel = false;
+          getVesselInfo();
+      }
     }
     else if (event == WebsocketsEvent::ConnectionClosed)
     {     
-        Serial.println("Wss Connnection Closed");     
+        Serial.print("Wss Connnection Closed: ");     
+        CloseReason reason = wsskClient.c.getCloseReason();
+        Serial.print("Close Reason:"); Serial.println(reason);
+        Serial.println(data);
         wsskClient.lastActivity = 0;
     }
     else if (event == WebsocketsEvent::GotPing)
@@ -47,8 +53,7 @@ extern "C"
       if(!found){
         Serial.println(message.data());
       }
-     
-    
+      
   }
   /*
   void ws_signalk_greet(WiFiClient& client) {
@@ -67,8 +72,13 @@ extern "C"
     {
       
       if (!client.c.available()) {
+      
         char buff[100];
 
+        client.lastActivity = millis();
+        client.c =  WebsocketsClient();
+        client.c.onMessage(onWsMessageCallback);
+        client.c.onEvent(onWsEventsCallback);
         sprintf(buff, "ws://%s:%d/signalk/v1/stream", host, port);
         Serial.print("Reconnecting to "); Serial.println(buff);
         if (client.c.connect(String(buff))) {
@@ -80,7 +90,7 @@ extern "C"
           Serial.println("Cannot connect");
         }
       }else{
-        Serial.println(".");
+        Serial.print(".");
       }
       if (client.lastActivity > 0 && (millis() - client.lastActivity) > 1000000) {
         Serial.println("Closing wss connection");

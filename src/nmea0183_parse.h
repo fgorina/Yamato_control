@@ -192,9 +192,7 @@ extern "C" {
             shipDataModel.environment.wind.apparent_wind_speed.kn = parse_float(windSpeedI.value()) / _GPS_KMPH_PER_KNOT;
             shipDataModel.environment.wind.apparent_wind_speed.age = millis();
           }
-          // PACO
-          Serial.print("Received * "); Serial.print(shipDataModel.environment.wind.apparent_wind_speed.kn); Serial.print(" at "); Serial.print(millis()); Serial.print(" at "); Serial.println(shipDataModel.environment.wind.apparent_wind_speed.age ); 
-
+          
         }
         if (strcmp("T", windReferenceI.value()) == 0) {
           if (strcmp("N", windSpeedUnitI.value()) == 0) {
