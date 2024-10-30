@@ -15,6 +15,11 @@ extern "C" {
   static lv_indev_drv_t indev_drv;  // Descriptor of a touch driver
   static unsigned long last_touched;
 
+  #define DISPLAY_ACTIVE 0
+  #define DISPLAY_SLEEPING 1
+  #define DISPLAY_WAKING 2
+  static int displaySaver = DISPLAY_ACTIVE;
+
   M5Display *tft;
 
   void tft_lv_initialization() {

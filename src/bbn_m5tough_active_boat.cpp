@@ -323,7 +323,7 @@ void setup()
 
 unsigned long last_ui_upd = 0;
 
-#define GO_SLEEP_TIMEOUT 1800000ul
+#define GO_SLEEP_TIMEOUT 60000ul
 
 void loop()
 {
@@ -340,12 +340,18 @@ void loop()
 
     if (last_touched > 0 && millis() - last_touched > GO_SLEEP_TIMEOUT)
     {
-      disconnect_clients();
-      save_page(page);
-      deep_sleep_with_touch_wakeup();
+     // disconnect_clients();
+     // save_page(page);
+      //deep_sleep_with_touch_wakeup();
+      displaySaver = DISPLAY_SLEEPING;
+      M5.Lcd.sleep();
     }
     else
     {
+      if (displaySaver == DISPLAY_SLEEPING){
+        M5.Lcd.wakeup();
+        displaySaver = DISPLAY_ACTIVE;
+      }
       #ifdef ENABLE_VICTRON
       if (victron_mqtt_began)
       {

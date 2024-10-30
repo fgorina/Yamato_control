@@ -5,7 +5,7 @@
 extern "C" {
 #endif
 
-  int theme = 1;
+  int theme = 0;
 
   void init_theme() {
     lv_theme_default_init(NULL, lv_palette_main(LV_PALETTE_BLUE), lv_palette_main(LV_PALETTE_RED), theme, LV_FONT_DEFAULT);
